@@ -3,6 +3,8 @@ import logging
 from datetime import datetime
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from exploren_rds_models.models import PriceSignal
 
 from config import DCH_API_KEY, DCH_DATA_POOL_ID, DCH_POINT_ID, DCH_UPLOAD_URL
@@ -112,10 +114,24 @@ def upload_to_dch(payload: dict) -> dict:
         "Content-Type": "application/json",
     }
 
+    # Configure retry strategy
+    retry_strategy = Retry(
+        total=5,
+        backoff_factor=3,
+        status_forcelist=[408, 429, 500, 502, 503, 504],
+        allowed_methods=["POST"],
+    )
+
+    # Create session with retry adapter
+    session = requests.Session()
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+
     LOGGER.info("Uploading payload to DCH at %s", DCH_UPLOAD_URL)
 
     try:
-        response = requests.post(
+        response = session.post(
             DCH_UPLOAD_URL, json=payload, headers=headers, timeout=30
         )
         response.raise_for_status()
@@ -125,6 +141,8 @@ def upload_to_dch(payload: dict) -> dict:
     except requests.exceptions.RequestException as e:
         LOGGER.exception("Failed to upload to DCH")
         raise
+    finally:
+        session.close()
 
 
 def lambda_handler(event, context):
