@@ -36,13 +36,6 @@ Resources:
         - arn:aws:lambda:ap-southeast-2:366898090587:layer:ExplorenRDSModelsLayer:15
       Environment:
         Variables:
-          DCH_API_KEY: A5ifPqXkZg0i1DEAYShJ2hyn0R4
-          DCH_REST_KEY:  c6ofwJYueWluoT01DjGDa4g4io4
-          DB_HOST: exploren-rds-proxy.proxy-cnf10gepzfn3.ap-southeast-2.rds.amazonaws.com
-          DB_NAME: postgres
-          DB_PASSWORD: 2AJyFj9Q!WDcSm
-          DB_PORT: 5432
-          DB_USER: exploren
       Architectures:
         - x86_64
       Events:
