@@ -1,0 +1,19 @@
+[project]
+name = "mta-to-dch"
+version = "0.1.0"
+description = "AWS Lambda function to upload NSW1 price signals to Data Clearing House"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "psycopg2-binary>=2.9.11",
+    "python-dotenv>=1.2.1",
+    "requests>=2.32.3",
+]
+
+[dependency-groups]
+dev = [
+    "exploren-rds-models",
+]
+
+[tool.uv.sources]
+exploren-rds-models = { git = "ssh://git@github.com/EVSE-Australia/Exploren-RDS-Models", tag = "v0.4.0" }

@@ -1,0 +1,55 @@
+# This AWS SAM template has been generated from your function's configuration. If
+# your function has one or more triggers, note that the AWS resources associated
+# with these triggers aren't fully specified in this template and include
+# placeholder values. Open this template in AWS Application Composer or your
+# favorite IDE and modify it to specify a serverless application with other AWS
+# resources.
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: MTA Price Signals to DCH Data Point
+Resources:
+  MTAToDCH:
+    Type: AWS::Serverless::Function
+    Properties:
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-0d5c051682768c74b
+          - sg-09d98a422c3173587
+        SubnetIds:
+          - subnet-0a6adb1c3a81cb473
+        Ipv6AllowedForDualStack: false
+      CodeUri: mta_to_dch/
+      Description: Description of lambda functino
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'sns:Publish'
+                - 'rds-db:connect'
+              Resource: '*'
+      Timeout: 120
+      MemorySize: 1024
+      Handler: main.lambda_handler
+      Runtime: python3.12
+      Layers:
+        - arn:aws:lambda:ap-southeast-2:366898090587:layer:ExplorenRDSModelsLayer:15
+      Environment:
+        Variables:
+          DCH_API_KEY: A5ifPqXkZg0i1DEAYShJ2hyn0R4
+          DCH_REST_KEY:  c6ofwJYueWluoT01DjGDa4g4io4
+          DB_HOST: exploren-rds-proxy.proxy-cnf10gepzfn3.ap-southeast-2.rds.amazonaws.com
+          DB_NAME: postgres
+          DB_PASSWORD: 2AJyFj9Q!WDcSm
+          DB_PORT: 5432
+          DB_USER: exploren
+      Architectures:
+        - x86_64
+      Events:
+        mtaToDCH:
+          Type: Schedule
+          Properties:
+            Schedule: 'rate(30 minutes)'
+            Name: DCHPriceSignalSchedule
+            Description: Schedule for fetching price signals
+            Enabled: true
